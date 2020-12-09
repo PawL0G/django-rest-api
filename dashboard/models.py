@@ -1,3 +1,87 @@
+from django.contrib.auth import get_user_model
 from django.db import models
+from django_quill.fields import QuillField
+from django.core.validators import MinLengthValidator
 
-# Create your models here.
+
+User = get_user_model()
+
+
+class Issue(models.Model):
+    PRIORITY_CHOICES = (
+        (0, "Information"),
+        (1, "Warning"),
+        (2, "Error"),
+        (3, "Critical"),
+    )
+
+    STATUS_CHOICES = (
+        (0, "Pending"),
+        (1, "In progress"),
+        (2, "Suspend"),
+        (3, "Completed"),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=120, verbose_name="Название")
+    text = QuillField(verbose_name="Описание")
+    git = models.URLField(blank=True, null=True)
+    date_time = models.DateTimeField(auto_now_add=True)
+    priority = models.IntegerField(choices=PRIORITY_CHOICES, blank=True, null=True)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ('-date_time',)
+
+
+class Message(models.Model):
+    text = models.TextField(verbose_name="Сообщение")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_time = models.DateTimeField(auto_now_add=True)
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.text
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, related_name='Лайки', on_delete=models.CASCADE)
+    comment = models.TextField(validators=[MinLengthValidator(150)])
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def get_total_likes(self):
+        return self.likes.users.count()
+
+    def get_total_dis_likes(self):
+        return self.dis_likes.users.count()
+
+    def __str__(self):
+        return str(self.comment)[:30]
+
+
+class Like(models.Model):
+    ''' like  comment '''
+
+    comment = models.OneToOneField(Comment, related_name="likes", on_delete=models.CASCADE)
+    users = models.ManyToManyField(User, related_name='requirement_comment_likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.comment.comment)[:30]
+
+class DisLike(models.Model):
+    ''' Dislike  comment '''
+
+    comment = models.OneToOneField(Comment, related_name="dis_likes", on_delete=models.CASCADE)
+    users = models.ManyToManyField(User, related_name='requirement_comment_dis_likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.comment.comment)[:30]
+

@@ -1,0 +1,56 @@
+{% extends 'site.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Issue
+{% endblock %}
+
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h2>{{ issue.title }}</h2>
+                <div class="d-flex justify-content-between my-3 text-muted">
+                    <p>Reporter: {{ issue.user }}</p>
+                    <p>Status: {{ issue.get_status_display }}</p>
+                    <p>Date & time: {{ issue.date_time }}</p>
+                </div>
+                {% autoescape off %}
+                    <p>{{ issue.text.html }}</p>
+                {% endautoescape %}
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+
+            <div class="col-12">
+                <hr class="my-5">
+                {% for message in issue.message_set.all %}
+                    <div class="mb-4 card p-4">
+                        <p class="font-weight-bolder">{{ message.user }}</p>
+                        <p>{{ message.text }}</p>
+                        <p class="text-muted">{{ message.date_time }}</p>
+                    </div>
+                {% empty %}
+                    <h4 class="text-muted text-center">Пока сообщений нет</h4>
+                {% endfor %}
+            </div>
+        </div>
+        {% if issue.status < 2 %}
+            <div class="row">
+                <div class="col-12">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        {% if request.user.is_staff %}
+                            {{ staff_form|crispy }}
+                        {% endif %}
+                        <input type="submit" class="btn btn-primary btn-block mt-3" value="Отправить">
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

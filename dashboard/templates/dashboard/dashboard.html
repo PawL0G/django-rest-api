@@ -1,0 +1,91 @@
+{% extends 'site.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <form method="get" class="py-5" action="{% url "search" %}">
+                    <div class="form-group">
+                        <label for="username">Имя пользователя</label>
+                        <input type="text" class="form-control" id="username" name="username">
+                    </div>
+                    <button class="btn btn-secondary" type="submit">Поиск</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-5">
+        <div class="row row-cols-1 row-cols-md-2">
+            {% for issue in issue_list %}
+                <div class="col mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ issue.title }}</h5>
+                            {% if request.user.is_staff %}
+                                <p class="text-muted">{{ issue.user }}</p>
+                            {% endif %}
+                            <p class="card-text">{{ issue.text.html|striptags|truncatewords:20 }}</p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <span>{{ issue.get_status_display }}</span>
+                            <span>{{ issue.date_time }}</span>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'issue' issue.pk %}" class="btn btn-primary btn-block">Открыть</a>
+                        </div>
+                    <div class="container-1 left">
+   <div class="f-card content">
+      <h2>{{page_obj.created_at}}</h2>
+      <p>{{page_obj.comment}}.</p>
+      <div class="text-left">
+         <span class="pointer">
+            {% if request.user in page_obj.likes.users.all%}
+            <!-- already liked-->
+            <a href=""> <i
+               data-toggle="tooltip" data-placement="bottom" title="Unlike"
+               class="like fas fa-thumbs-up pr-2">
+            <span>{{page_obj.get_total_likes}}</span>
+            </i>
+            </a>
+            {% else %}
+            <!--not liked-->
+            <a href="{% url 'requirement_comment_vote' comment_id=page_obj.pk opition='like' %}"><i
+               data-toggle="tooltip" data-placement="bottom" title="Like"
+               class="default-icon fas fa-thumbs-up pr-2">
+            <span>{% if page_obj.get_total_likes  %}{{page_obj.get_total_likes}} {% else %} 0
+            {% endif %}</span></i>
+            </a>
+            {% endif %}
+         </span>
+         <span class="ml-3 pointer">
+         {% if request.user in page_obj.dis_likes.users.all %}
+         <a href="{% url 'requirement_comment_vote' comment_id=page_obj.pk opition='dis_like' %}"><i
+            data-toggle="tooltip" data-placement="bottom" title="i dislike this"
+            class="dislike fas fa-thumbs-down pr-2">
+         <span>{{page_obj.get_total_dis_likes}}</span></i>
+         </a>
+         {% else %}
+         <a href="{% url 'requirement_comment_vote' comment_id=page_obj.pk opition='dis_like' %}"><i
+            data-toggle="tooltip" data-placement="bottom" title="i dislike this "
+            class="default-icon fas fa-thumbs-down pr-2">
+         <span>{% if  page_obj.get_total_dis_likes %}{{page_obj.get_total_dis_likes}}
+         {% else %} 0 {% endif %}</span></i>
+         </a>
+         {% endif %}
+         </span>
+      </div>
+      <p class="text-right">{{page_obj.user.first_name}} {{page_obj.user.last_name}}.
+         {% if page_obj.user == request.user  %}
+         <span><a class="circle-card" href="{% url 'requirement_comment_update' page_obj.id %}"><i class="fas fa-edit"></a></i></span>
+         {% endif %}
+      </p>
+   </div>
+</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
