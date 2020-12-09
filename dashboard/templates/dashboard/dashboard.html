@@ -6,7 +6,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <form method="get" class="py-5" action="{% url "search" %}">
+                <form method="get" class="py-5" action={% url "search" %}>
                     <div class="form-group">
                         <label for="username">Имя пользователя</label>
                         <input type="text" class="form-control" id="username" name="username">
@@ -35,7 +35,12 @@
                         <div class="card-footer">
                             <a href="{% url 'issue' issue.pk %}" class="btn btn-primary btn-block">Открыть</a>
                         </div>
-                    <div class="container-1 left">
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+<div class="container-1 left">
    <div class="f-card content">
       <h2>{{page_obj.created_at}}</h2>
       <p>{{page_obj.comment}}.</p>
@@ -43,7 +48,7 @@
          <span class="pointer">
             {% if request.user in page_obj.likes.users.all%}
             <!-- already liked-->
-            <a href=""> <i
+            <a href={% url 'requirement_comment_vote' comment_id=page_obj.pk opition='like' %}> <i
                data-toggle="tooltip" data-placement="bottom" title="Unlike"
                class="like fas fa-thumbs-up pr-2">
             <span>{{page_obj.get_total_likes}}</span>
@@ -51,7 +56,7 @@
             </a>
             {% else %}
             <!--not liked-->
-            <a href="{% url 'requirement_comment_vote' comment_id=page_obj.pk opition='like' %}"><i
+            <a href={% url 'requirement_comment_vote' comment_id=page_obj.pk opition='like' %}><i
                data-toggle="tooltip" data-placement="bottom" title="Like"
                class="default-icon fas fa-thumbs-up pr-2">
             <span>{% if page_obj.get_total_likes  %}{{page_obj.get_total_likes}} {% else %} 0
@@ -61,13 +66,13 @@
          </span>
          <span class="ml-3 pointer">
          {% if request.user in page_obj.dis_likes.users.all %}
-         <a href="{% url 'requirement_comment_vote' comment_id=page_obj.pk opition='dis_like' %}"><i
+         <a href={% url 'requirement_comment_vote' comment_id=page_obj.pk opition='dis_like' %}><i
             data-toggle="tooltip" data-placement="bottom" title="i dislike this"
             class="dislike fas fa-thumbs-down pr-2">
          <span>{{page_obj.get_total_dis_likes}}</span></i>
          </a>
          {% else %}
-         <a href="{% url 'requirement_comment_vote' comment_id=page_obj.pk opition='dis_like' %}"><i
+         <a href={% url 'requirement_comment_vote' comment_id=page_obj.pk opition='dis_like' %}><i
             data-toggle="tooltip" data-placement="bottom" title="i dislike this "
             class="default-icon fas fa-thumbs-down pr-2">
          <span>{% if  page_obj.get_total_dis_likes %}{{page_obj.get_total_dis_likes}}
@@ -83,9 +88,5 @@
       </p>
    </div>
 </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
 {% endblock %}
+

@@ -48,7 +48,7 @@ class Message(models.Model):
 
 
 class Comment(models.Model):
-    user = models.ForeignKey(User, related_name='Лайки', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
     comment = models.TextField(validators=[MinLengthValidator(150)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
