@@ -1,0 +1,23 @@
+{% extends 'site.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Сообщить о пролеме
+{% endblock %}
+
+
+{% block content %}
+    {{ form.media }}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-8">
+                <h1>Сообщить о пролеме</h1>
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary btn-block mt-4">Сообщить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
