@@ -28,6 +28,10 @@ class Issue(models.Model):
     priority = models.IntegerField(choices=PRIORITY_CHOICES, blank=True, null=True)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     likes = models.ManyToManyField(User, related_name='issue_likes')
+    total_likes = models.IntegerField(default=0)
+
+    def total_likes(self):
+        return self.likes.count()
 
     def __str__(self):
         return self.title
@@ -44,5 +48,3 @@ class Message(models.Model):
 
     def __str__(self):
         return self.text
-
-

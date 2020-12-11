@@ -6,7 +6,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <form method="get" class="py-5" action="{% url "search" %}">
+                <form method="get" class="py-5" action="{% url 'search' %}">
                     <div class="form-group">
                         <label for="username">Имя пользователя</label>
                         <input type="text" class="form-control" id="username" name="username">
@@ -29,11 +29,33 @@
                             <p class="card-text">{{ issue.text.html|striptags|truncatewords:20 }}</p>
                         </div>
                         <div class="card-footer d-flex justify-content-between">
-                            <span>{{ issue.get_status_display }}</span>
+                            <span>Status: {{ issue.get_status_display }}</span>
                             <span>{{ issue.date_time }}</span>
                         </div>
                         <div class="card-footer">
                             <a href="{% url 'issue' issue.pk %}" class="btn btn-primary btn-block">Открыть</a>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <div class="col-md-12">
+                                 <p>total likes - {{ total_likes }}</p>
+                                <form action="{% url 'issue_likes' issue.pk %}" method="POST">
+                                    {% csrf_token %}
+
+                                    <div class="row">
+                                        <div class="col-md-6 justify-content-start">
+                                             <div class="row">
+                                                 <button type="submit" name="issue_id" value="{{ issue.id }}" class="btn btn-success btn-block border-0 rounded p-1 mr-1">Like</button>
+                                             </div>
+                                            <p>total likes - {{ total_likes }}</p>
+                                        </div>
+                                        <div class="col-md-6 justify-content-end no-gutters">
+                                             <div class="row">
+                                                 <button type="submit" name="issue_id" value="{{ issue.id }}" class="btn btn-danger btn-block border-0 rounded p-1 ml-1">Dislike</button>
+                                             </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

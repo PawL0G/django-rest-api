@@ -1,13 +1,33 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.http import HttpResponseForbidden, HttpResponseNotFound
-from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import ListView, FormView
+from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse_lazy, reverse
+from django.views.generic import ListView, FormView, DetailView
 
 from .forms import IssueForm
 from .models import Issue
 from .services import get_issue, get_form, get_staff_from
+
+
+def LikeView(request, pk):
+    liked = False
+    model = get_object_or_404(Issue, id=request.POST.get('issue_id'))
+
+    if model.likes.filter(id=request.user.id).exists():
+        model.likes.remove(request.user)
+        liked = False
+    else:
+        model.likes.add(request.user)
+        liked = True
+
+    total_likes = model.likes.count()
+
+    context = {
+        "total_likes": total_likes
+    }
+
+    return HttpResponseRedirect(reverse('dashboard'), context)
 
 
 class Dashboard(LoginRequiredMixin, ListView):
@@ -19,6 +39,27 @@ class Dashboard(LoginRequiredMixin, ListView):
         if self.request.user.is_staff:
             return self.model.objects.all()
         return self.model.objects.filter(user=self.request.user)
+
+    # def get_context_data(self, *args, **kwargs):
+    #     # Call the base implementation first to get a context
+    #     context = super(Dashboard, self).get_context_data(*args, **kwargs)
+    #     # add whatever to your context:
+    #     data = Issue.objects.all()
+    #     total_likes = data.total_likes()
+    #     context["total_likes"] = total_likes
+    #     return context
+
+
+class LikeList(DetailView):
+    template_name = "dashboard/dashboard.html"
+    model = Issue
+
+    def get_context_data(self, **kwargs):
+        context = super(LikeList).get_context_data(**kwargs)
+        data = get_object_or_404(Post, id=self.kwargs['pk'])
+        total_likes = data.total_likes()
+        context["total_likes"] = total_likes
+        return context
 
 
 def search_page(request):

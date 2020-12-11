@@ -2,4 +2,7 @@ venv/
 .idea/
 #db.sqlite3
 #sqlite3.exe
-#env/
+env/
+dashboard/migrations/__pycache__/*.pyc
+issue_tracking_system/__pycache__/*.pyc
+dashboard/__pycache__/*.pyc
